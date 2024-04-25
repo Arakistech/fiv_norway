@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="es_ES">
+<head>
+
+    
+    <meta charset="utf-8">
+    <title>Castilla y León Logística</title>
+	
+    <meta name="description" content="LogistiCastilla - by Metabertsoa"/>
+    <meta name="keywords" content="Castilla, León, Logística"/>
+    <meta name="author" content="www.LogistiCastilla.eus"/>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no"/>
+    <meta property="og:title" content="GLogistiCastilla" />
+    <meta property="og:locale" content="es_ES" />
+    <meta property="og:url" content="https://arakistech.github.io/Aporta2021/" />
+    <meta property="og:site_name" content="LogistiCastilla" />
+    <meta property="og:image" content="https://github.com/Arakistech/Castilla/blob/941a068553a0505c390ce883b5b3d0f128e51a21/images/cylog.jpg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@Tactizity" />
+	
+    <link rel="canonical" href="https://arakistech.github.io/Aporta2021/" />
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/images/35bfc7e8c123f9d5.png">
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.css" rel="stylesheet">
+    <link href="rain-layer.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/themes/monolith.min.css" rel="stylesheet">
+    <link href='mapbox-gl-traffic.css' rel='stylesheet' />
+	
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mapbox-gl-rain-layer@0.5.0/dist/mapbox-gl-rain-layer.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/suncalc@1.8.0/suncalc.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@simonwep/pickr/dist/pickr.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.0/jquery.min.js"></script>
+    <script src='https://npmcdn.com/csv2geojson@latest/csv2geojson.js'></script>
+    <script src='mapbox-gl-traffic.js'></script>
+    
+    <!-- Import Turf and Polyline -->
+    <script src="https://npmcdn.com/@turf/turf/turf.min.js"></script>
+    <script src=https://cdnjs.cloudflare.com/ajax/libs/mapbox-polyline/1.1.1/polyline.js></script>
+
+    <!-- Import Mapbox GL Directions -->
+    <script src="mapbox-gl-directions.js"></script>
+    <script src="mapbox-gl-accessibility.js"></script>
+    <link rel="stylesheet" href=https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-directions/v4.0.2/mapbox-gl-directions.css type="text/css" /> 
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+       
+</head>
+<body>
+    <div id="root">
+        <div id="map">
+            <div class="video-toggler"></div>
+             <div id="instructions"></div>
+                <div id="left" class="sidebar flex-center left collapsed">
+                <div class="sidebar-content rounded-rect flex-center">     <div id="title">
+                    <div id="time"></div>
+                    <div id="last-updated"></div>
+			<a id="downloadLink" href="" download="map.png">Descarga .png ↓</a>
+			</div>
+  				<script>
+     					var y = document.getElementById('check');
+     		 			y ? y.addEventListener('change', function(){
+      					document.getElementById('verdict').innerHTML = y.checked;
+    					}) : '';
+	  			</script>
+		
+                    <iframe id="scaled-frame" src="https://arakistech.github.io/LUX/AQI/index.html" width="90%" height="625" scrolling="no" style="border:none;" style="padding-top: 80px;" style="overflow:hidden;"></iframe> 
+		 
+			
+			<!-- <img src="aire.jpg" alt="Italian Trulli"> -->
+                    <div id="legend" class="hidden"></div>
+                     <div class="sidebar-toggle rounded-rect left" onclick="toggleSidebar('left')" >&rarr; 
+                        </div>
+                    </div>
+                </div>
+            </div>
+        
+   
+	    
+	    
+        <div id="map-styles-bg">
+            <div id="map-styles">
+                <div id="iarakistain/cl5guvut6006o14o1nl0ppe5u"><span></span>Alturas edificios</div> 
+	        <div id="iarakistain/cl64qr1rf000414oal5n058aj"><span></span>Edificios con/sin ascensor</div>    
+                <div id="iarakistain/cllewvxq5011p01ph3ovh6h5d" class="active"><span></span>Medios accesibles</div> 
+		<div id="iarakistain/cl5gil0ym006614o1gkrym5ke"><span></span>Sensores Aire</div>
+                <div id="terrain" ><span></span>Terreno 3D</div>
+                <div id="iarakistain/cl65j5le2000z14tipe3hsnuy"><span></span>Calles</div>
+                <div id="iarakistain/cl65izeqo000x14ti16nbcx42"><span></span>Topográfico</div>
+                <div id="iarakistain/cl65iqpnc003114n3awqprzvs"><span></span>Claro</div>
+                <div id="iarakistain/cl65i9s4g000q15oxdwsvktsv"><span></span>Oscuro</div>
+            </div>
+        </div>
+        
+        <div id="rain-bg">
+            <div id="rain">
+                <div id="color-select">
+                    <div id="rain-color-button" class="active">Color Lluvia</div>
+                    <div id="snow-color-button">Color Nieve</div>
+                </div>
+                <div id="rain-color-picker" class="active">
+                    <div id="rain-color-picker-inner" ></div>
+                </div>
+                <div id="snow-color-picker">
+                    <div id="snow-color-picker-inner"></div>
+                </div>
+                <hr>
+                <div>Opacidad capa: <span id="mesh-opacity">0.1</span></div>
+                <div>
+                    <input id="slider" type="range" min="0" max="1" step="0.01" value="0.1">
+                </div>
+            </div>
+        </div>
+        <div id="info-bg">
+            <div id="info">
+                <h3>Sobre LogistiCastilla</h3>
+		<p>Esta visualización ha sido desarrollada por <a href="https://www.linkedin.com/in/iarakis/" target="_blank">Ivan Araquistain</a>. Los datos para la visualización se han obtenido de <a href="https://datosabiertos.jcyl.es/web/es/datos-abiertos-castilla-leon.html" target="_blank">fuentes de datos abiertos de Castilla y León </a>.</p>
+                <p>Más información en  <a href="https://www.hackster.io/508240/vibration-anomaly-detection-on-logistics-infrastructure-35c0df" target="_blank">este enlace</a> </p>
+            </div>
+        </div>
+        <div id="legenda"></div>
+    </div>
+    
+    
+    <style>
+        img {
+                width: 70%;
+            }
+    </style>
+    
+    <script>
+        class MapboxGLButtonControl {
+            constructor(optionArray) {
+                this._options = optionArray.map(options => ({
+                    className: options.className || '',
+                    title: options.title || '',
+                    eventHandler: options.eventHandler
+                }));
+            }
+
+            onAdd(map) {
+                const me = this;
+
+                me._map = map;
+
+                me._container = document.createElement('div');
+                me._container.className = 'mapboxgl-ctrl mapboxgl-ctrl-group';
+
+                me._buttons = me._options.map(options => {
+                    const button = document.createElement('button'),
+                        icon = document.createElement('span'),
+                        {className, title, eventHandler} = options;
+
+                button.className = className;
+                button.type = 'button';
+                button.title = title;
+                button.setAttribute('aria-label', title);
+                button.onclick = eventHandler;
+                icon.className = 'mapboxgl-ctrl-icon';
+                icon.setAttribute('aria-hidden', true);
+                button.appendChild(icon);
+                me._container.appendChild(button);
+
+                return button;
+            });
+
+            return me._container;
+        }
+
+        onRemove() {
+            const me = this;
+            me._container.parentNode.removeChild(me._container);
+            me._map = undefined;
+        }
+    }
+
+    function setSunPosition(map) {
+        const {lng, lat} = map.getCenter();
+        const {azimuth, altitude} = SunCalc.getPosition(Date.now(), lat, lng);
+        const sunAzimuth = 180 + azimuth * 180 / Math.PI;
+        const sunAltitude = 90 - altitude * 180 / Math.PI;
+        map.getLayer('sky') ? map.setPaintProperty('sky', 'sky-atmosphere-sun', [sunAzimuth, sunAltitude]) : '';
+    }
+
+    const root = document.getElementById('root');
+    const time = document.getElementById('time');
+    const lastUpdated = document.getElementById('last-updated');
+    const legend = document.getElementById('legend');
+    const mapStyleBg = document.getElementById('map-styles-bg');
+    const rainBg = document.getElementById('rain-bg');
+    const rain = document.getElementById('rain');
+    const rainColorButton = document.getElementById('rain-color-button');
+    const snowColorButton = document.getElementById('snow-color-button');
+    const rainColorPicker = document.getElementById('rain-color-picker');
+    const snowColorPicker = document.getElementById('snow-color-picker');
+    const slider = document.getElementById('slider');
+    const infoBg = document.getElementById('info-bg');
+    const info = document.getElementById('info');
+    let mapStyle = 'terrain';
+	
+	    
+	    
+    mapboxgl.accessToken = 'pk.eyJ1IjoiaWFyYWtpc3RhaW4iLCJhIjoiY2podnY0cWs5MTAyaTNrbnY3MnR5OHJ0bSJ9.aOqeUPZkBISqt1UKpmmX7g';
+    const map = new mapboxgl.Map({
+        container: 'map',
+       style:'mapbox://styles/iarakistain/cllewvxq5011p01ph3ovh6h5d',
+        center:[-3.228, 41.6551800],
+        pitch:40,
+        projection:'globe',
+        zoom:7.5,
+        minZoom: 2,
+        maxZoom: 18,
+        hash: true,
+	    preserveDrawingBuffer: true,
+        language: 'es'
+    });
+          
+    var popup = new mapboxgl.Popup({
+        closeButton: false,
+        closeOnClick: true
+    });
+
+    const rainLayer = new RainLayer({
+        id: 'rain',
+        source: 'rainviewer',
+        scale: 'noaa'
+    });
+    
+    var geojsonFeatures = {
+      type: 'FeatureCollection',
+      features: [{
+        type: 'Feature',
+        "geometry": { "type": "Point", "coordinates": [-3.6289264529049388, 42.37381534545422] },
+        "properties": {
+          'title': 'Burgos',
+          'marker-color': '#3c4e5a',
+          'marker-symbol': 'monument',
+          'marker-size': 'small',
+
+          // Store the image url and caption in an array.
+          'images': [
+            ['https://imgur.com/v4QMSXl.jpeg', 'Centro Logístico'],
+            ['https://imgur.com/v4QMSXl.jpg', 'Centro Logístico'],
+            ['hhttps://imgur.com/v4QMSXl.jpg', 'Centro Logístico']
+          ]
+        }
+      },
+                 
+                 {
+                     type: 'Feature',
+        "geometry": { "type": "Point", "coordinates": [-5.739216773877916, 42.543215832101225] },
+        "properties": {
+          'title': 'Leon',
+          'marker-color': '#3c4e5a',
+          'marker-symbol': 'monument',
+          'marker-size': 'small',
+
+          // Store the image url and caption in an array.
+          'images': [
+            ['https://imgur.com/BDoAizR.jpeg', 'Centro Logístico'],
+            ['https://imgur.com/BDoAizR.jpg', 'Centro Logístico'],
+            ['https://imgur.com/BDoAizR.jpg', 'Centro Logístico']
+          ]
+        }
+      },
+
+{
+                     type: 'Feature',
+        "geometry": { "type": "Point", "coordinates": [-5.736010551061636, 40.971891881088574] },
+        "properties": {
+          'title': 'Salamanca – Zaldesa ',
+          'marker-color': '#3c4e5a',
+          'marker-symbol': 'monument',
+          'marker-size': 'small',
+
+          // Store the image url and caption in an array.
+          'images': [
+            ['https://imgur.com/1NqImvP.jpeg', 'Centro Logístico'],
+            ['https://imgur.com/1NqImvP.jpg', 'Centro Logístico'],
+            ['https://imgur.com/1NqImvP.jpg', 'Centro Logístico']
+          ]
+        }
+      },
+
+
+{
+                     type: 'Feature',
+        "geometry": { "type": "Point", "coordinates": [-5.663642668960777, 42.008549458273] },
+        "properties": {
+          'title': 'Benavente',
+          'marker-color': '#3c4e5a',
+          'marker-symbol': 'monument',
+          'marker-size': 'small',
+
+          // Store the image url and caption in an array.
+          'images': [
+            ['https://imgur.com/UNO6wCW.jpeg', 'Centro Logístico'],
+            ['hhttps://imgur.com/UNO6wCW.jpg', 'Centro Logístico'],
+            ['https://imgur.com/UNO6wCW.jpg', 'Centro Logístico']
+          ]
+        }
+      },
+
+{
+                     type: 'Feature',
+        "geometry": { "type": "Point", "coordinates": [-4.722020356725578, 41.686686586991875] },
+        "properties": {
+          'title': 'Valladolid',
+          'marker-color': '#3c4e5a',
+          'marker-symbol': 'monument',
+          'marker-size': 'small',
+
+          // Store the image url and caption in an array.
+          'images': [
+            ['https://imgur.com/tn634BP.jpeg', 'Centro Logístico'],
+            ['https://imgur.com/tn634BP.jpg', 'Centro Logístico'],
+            ['https://imgur.com/tn634BP.jpg', 'Centro Logístico']
+          ]
+        }
+      },
+
+{
+                     type: 'Feature',
+        "geometry": { "type": "Point", "coordinates": [-4.526363932729839, 42.04412665702607] },
+        "properties": {
+          'title': 'Palencia',
+          'marker-color': '#3c4e5a',
+          'marker-symbol': 'monument',
+          'marker-size': 'small',
+
+          // Store the image url and caption in an array.
+          'images': [
+            ['https://imgur.com/TL3jW8n.jpeg', 'Centro Logístico'],
+            ['https://imgur.com/TL3jW8n.jpg', 'Centro Logístico'],
+            ['https://imgur.com/TL3jW8n.jpg', 'Centro Logístico']
+          ]
+        }
+      },
+
+{
+                     type: 'Feature',
+        "geometry": { "type": "Point", "coordinates": [-4.696030239010888, 40.68248207171168] },
+        "properties": {
+          'title': 'Ávila',
+          'marker-color': '#3c4e5a',
+          'marker-symbol': 'monument',
+          'marker-size': 'small',
+
+          // Store the image url and caption in an array.
+          'images': [
+            ['https://imgur.com/jqkoEz9.jpg', 'Centro Logístico'],
+            ['https://imgur.com/jqkoEz9.jpg', 'Centro Logístico'],
+            ['https://imgur.com/jqkoEz9.jpg', 'Centro Logístico']
+          ]
+        }
+      },
+
+{
+                     type: 'Feature',
+        "geometry": { "type": "Point", "coordinates": [-6.638233564562352, 42.568021039277205] },
+        "properties": {
+          'title': 'Ponferrada',
+          'marker-color': '#3c4e5a',
+          'marker-symbol': 'monument',
+          'marker-size': 'small',
+
+          // Store the image url and caption in an array.
+          'images': [
+            ['https://imgur.com/TL3jW8n.jpeg', 'Centro Logístico'],
+            ['https://imgur.com/TL3jW8n.jpg', 'Centro Logístico'],
+            ['https://imgur.com/TL3jW8n.jpg', 'Centro Logístico']
+          ]
+        }
+      },
+            
+                 {
+                     type: 'Feature',
+        "geometry": { "type": "Point", "coordinates": [-5.720628754916835, 40.9695221504038] },
+        "properties": {
+          'title': 'Salamanca – Cetramesa',
+          'marker-color': '#3c4e5a',
+          'marker-symbol': 'monument',
+          'marker-size': 'small',
+
+          // Store the image url and caption in an array.
+          'images': [
+            ['https://i.imgur.com/oppIjI5.jpeg', 'Centro Logístico'],
+            ['https://i.imgur.com/xND1MND.jpg', 'Centro Logístico'],
+            ['https://i.imgur.com/EKJmqui.jpg', 'Centro Logístico']
+          ]
+        }
+      } ]
+    };
+
+      
+    map.on('load', function () {
+      geojsonFeatures.features.forEach(function (marker) {
+
+        var el = document.createElement('div');
+        el.className = 'marker';
+        el.innerHTML = '<img src="assets/images/images/Escalera_grande.png" height="35px" style="width:38px;" />';
+        // el.style.width = 32 + 'px';
+        // el.style.height = 32 + 'px';
+
+        var images = marker.properties.images
+        var slideshowContent = ""
+
+        for (var i = 0; i < images.length; i++) {
+          var img = images[i];
+
+          slideshowContent += '<div class="image' + (i === 0 ? ' active' : '') + '">' +
+            '<img src="' + img[0] + '" />' +
+            '<div class="caption">' + img[1] + '</div>' +
+            '</div>';
+        }
+
+        var popupContent = '<div id="' + marker.properties.id + '" class="popup">' +
+          '<h2>' + marker.properties.title + '</h2>' +
+          '<div class="slideshow">' +
+          slideshowContent +
+          '</div>' +
+          '<div class="cycle">' +
+          '<a href="#" class="prev">&laquo; Previo</a>' +
+          '<a href="#" class="next">Siguiente &raquo;</a>' +
+          '</div>'
+        '</div>';
+        
+        var popup = new mapboxgl.Popup({ offset: 25 }).setHTML(popupContent)
+        let markerInstance = new mapboxgl.Marker(el)
+          .setPopup(popup)
+          .setLngLat(marker.geometry.coordinates);
+
+        // create the popup
+        el.onclick = function(e) {
+            e.stopPropagation();
+            markerInstance.togglePopup();
+        }
+
+        markerInstance.addTo(map);
+
+      })
+    })
+
+    $('#map').on('click', '.popup .cycle a', function () {
+      var $slideshow = $('.slideshow'),
+        $newSlide;
+
+      if ($(this).hasClass('prev')) {
+        $newSlide = $slideshow.find('.active').prev();
+        if ($newSlide.index() < 0) {
+          $newSlide = $('.image').last();
+        }
+      } else {
+        $newSlide = $slideshow.find('.active').next();
+        if ($newSlide.index() < 0) {
+          $newSlide = $('.image').first();
+        }
+      }
+
+      $slideshow.find('.active').removeClass('active').hide();
+      $newSlide.addClass('active').show();
+      return false;
+    });
+        
+            
+let videoMarkers, showMarkers=true, showDefibrilators=true;    
+map.on('load', () => {		
+    map.addSource('places', {
+    'type': 'geojson',
+    'data': {
+        'type': 'FeatureCollection',
+        'features': [
+            {
+                'type': 'Feature',
+                'properties': {
+                    'description':
+                    '<strong>Punto cardioprotegido 1</strong><p>BEXEN CARDIO REANIBEX</p>'
+                },
+                'geometry': {
+                    'type': 'Point',
+                    'coordinates': [-2.5049797467, 43.1876122798]
+                }
+            },
+            {
+                'type': 'Feature',
+                'properties': {
+                    'description':
+                    '<strong>Punto cardioprotegido 2</strong><p>BEXEN CARDIO REANIBEX</p>'
+                },
+                'geometry': {
+                    'type': 'Point',
+                    'coordinates': [-2.5016121705, 43.1860840471]  
+                }
+            },
+            {
+                'type': 'Feature',
+                'properties': {
+                    'description':
+                    '<strong>Punto cardioprotegido 3</strong><p>REANIBEX 300</p>'
+                },
+                'geometry': {
+                    'type': 'Point',
+                    'coordinates': [-2.52123, 43.18618]
+                }
+            },
+            {
+                'type': 'Feature',
+                'properties': {
+                    'description':
+                    '<strong>Punto cardioprotegido 4</strong><p>PHILIPS HEARTSTART HS1</p> <p>Horario: 06:00h-23:00h</p>'
+                },
+                'geometry': {
+                    'type': 'Point',
+                    'coordinates': [-2.5078479943, 43.1895818411]  
+                }
+            },
+            {
+                'type': 'Feature',
+                'properties': {
+                    'description':
+                    '<strong>Punto cardioprotegido 5</strong><p>PHILIPS HEARTSTART HS1</p> <p>Horario: 06:00h-23:00h</p>'
+                },
+                'geometry': {
+                    'type': 'Point',
+                    'coordinates': [-2.5099269852, 43.1867459779]
+                }
+            },
+            {
+                'type': 'Feature',
+                'properties': {
+                'description':
+                '<strong>Punto cardioprotegido 6</strong><p>PHILIPS HEARTSTART HS1</p> <p>Horario: 06:00h-23:00h</p>'
+            },
+                'geometry': {
+                    'type': 'Point',
+                    'coordinates': [-2.500951664, 43.1849725]
+                }
+            },
+            {
+                'type': 'Feature',
+                'properties': {
+                    'description':
+                    '<strong>Punto cardioprotegido 7</strong><p>PHILIPS HEARTSTART HS1</p> <p>Horario: 24 horas</p>'
+                },
+                'geometry': {
+                    'type': 'Point',
+                    'coordinates': [-2.507861039, 43.1908838067]
+                }
+            },
+            {
+                'type': 'Feature',
+                'properties': {
+                    'description':
+                    '<strong>Punto cardioprotegido 8</strong><p>PHILIPS HEARTSTART HS1</p> <p>Horario: 06:00h-23:00h</p>'
+                },
+                'geometry': {
+                    'type': 'Point',
+                    'coordinates': [-2.5094462739, 43.1911458099]
+                }
+            },	
+            {
+                'type': 'Feature',
+                'properties': {
+                    'description':
+                    '<strong>Punto cardioprotegido 9</strong><p>PHILIPS HEARTSTART HS1</p><p>Horario: 24 horas</p>'
+                },
+                'geometry': {
+                    'type': 'Point',
+                    'coordinates': [-2.5084214572, 43.187529778]
+                }
+            },	
+            {
+                'type': 'Feature',
+                'properties': {
+                    'description':
+                    '<strong>Punto cardioprotegido 10</strong><p>PHILIPS HS1</p> <p>Horario: 24 horas</p>'
+                },
+                'geometry': {
+                    'type': 'Point',
+                    'coordinates': [-2.50735, 43.18719]
+                }
+            },
+            {
+                'type': 'Feature',
+                'properties': {
+                    'description':
+                    '<strong>Punto cardioprotegido 11</strong><p>PHILIPS HS1</p> <p>Horario: 06:00h-23:00h</p>'
+                },
+                'geometry': {
+                    'type': 'Point',
+                    'coordinates': [-2.5073466866, 43.1872155705]
+                }
+            },
+            {
+                'type': 'Feature',
+                'properties': {
+                    'description':
+                    "<strong>Seersucker Bike Ride and Social</strong><p>Feeling dandy? Get fancy, grab your bike, and take part in this year's Seersucker Social bike ride from Dandies and Quaintrelles. After the ride enjoy a lawn party at Hillwood with jazz, cocktails, paper hat-making, and more. 11:00-7:00 p.m.</p>"
+                },
+                'geometry': {
+                    'type': 'Point',
+                    'coordinates': [-77.007481, 38.876516]
+                }
+            }]
+        }
+    });
+        
+    
+    // Create a popup, but don't add it to the map yet.
+    const popup = new mapboxgl.Popup({
+        closeButton: false,
+        closeOnClick: false
+    });
+    
+	
+    map.on('mouseenter', 'defibrilators', handleMouseEnter);
+    
+     map.on('mouseenter', 'defibrilators', (e) => {
+        // Change the cursor style as a UI indicator.
+        map.getCanvas().style.cursor = 'pointer';
+        
+        // Copy coordinates array.
+        let feature = e.features[0];
+        // console.log(feature);
+
+        const coordinates = e.features[0].geometry.coordinates.slice();
+        const description = `<strong>${e.features[0].properties.nombre}</strong>
+             <p>${e.features[0].properties.operador}</p> 
+             <p>Tipo: ${e.features[0].properties.tipo}h</p>`;
+
+         while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+             coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+         }
+        
+        popup.setLngLat(coordinates).setHTML(description).addTo(map);
+     });
+    
+    map.on('mouseleave', 'defibrilators', () => {
+        map.getCanvas().style.cursor = '';
+            popup.remove();
+    });
+
+    // escalator and elevetors 
+    map.on('mouseenter', 'ascensores', handleMouseEnter);
+    map.on('mouseenter', 'rampas', handleMouseEnter);
+
+    map.on('mouseleave', 'ascensores', handleMouseLeave);
+    map.on('mouseleave', 'rampas', handleMouseLeave);
+
+    function handleMouseEnter(e) {
+        map.getCanvas().style.cursor = 'pointer';
+        
+        // console.log(e.features[0]);
+        
+        // Copy coordinates array.
+        const coordinates = e.features[0].geometry.coordinates.slice();
+        const description = `<div class="popup-content">
+            <p><strong>${e.features[0].properties.Direccion}</strong></p> 
+            <p>Centro Logístico ${e.features[0].properties['Elemento'] || ""}</p> 
+        </div>
+        `;
+        
+        // Ensure that if the map is zoomed out such that multiple
+        // copies of the feature are visible, the popup appears
+        // over the copy being pointed to.
+        while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+            coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+        }
+        
+        // Populate the popup and set its coordinates
+        // based on the feature found.
+        popup.setLngLat(coordinates).setHTML(description).addTo(map);
+    }
+
+    function handleMouseLeave(e) {
+        map.getCanvas().style.cursor = '';
+        
+        popup.remove();
+    }
+
+
+    map.on('zoomend', function(e) {
+        let zoom = map.getZoom();
+
+        if(zoom > 16) {
+            map.removeLayer(rainLayer);
+        } else {
+            if(!map.getLayer('rain')) {
+                map.getLayer('water-boundary-bg') ? map.addLayer(rainLayer, 'water-boundary-bg') : map.addLayer(rainLayer);
+            }
+        }
+    });
+
+    // display the camera
+    fetch('./Ubicaciones_Cameras_LatLong.json')
+    .then(res => res.json())
+    .then(data => {
+        console.log(data);
+
+        // create markers
+        videoMarkers = data.features.map(ft => {
+            let marker = createMarker(ft);
+            return marker;
+        });
+
+    })
+    .catch(console.error);
+
+
+    function createMarker(ft) {
+        let markerDiv = document.createElement('div');
+        markerDiv.className = 'livecam-marker';
+
+        let mapMarker = new mapboxgl.Marker({element:markerDiv});
+        // markerDiv.
+
+        let camera = ft.properties.Direccion;
+        let video = camera.replace("CAMERA", "Video");
+        
+        
+        let videos = {
+            Video1:"https://www.youtube.com/embed/Avt_dtm0n4s?autoplay=1&mute=1",
+            Video2:"https://www.youtube.com/embed/3vhHJhThijc?autoplay=1&mute=1",
+            Video3:"https://www.youtube.com/embed/mYFzuaxszdw?autoplay=1&mute=1",
+            Video4:"https://www.youtube.com/embed/s0AMJJINyDo?autoplay=1&mute=1",
+            Video5:"https://www.youtube.com/embed/s3ET4Cpmtsg?autoplay=1&mute=1",
+        };
+
+        // <video class="video" controls>
+        //         <source src="./assets/videos/${videos.video}.mp4" type="video/mp4">
+        //     </video>
+	    
+	    
+        let popupContent = `<div class="popup-content">
+            <h5>${ft.properties.Direccion}</h5>
+            <iframe src="${videos[video]}" class="video" allow="autoplay"></iframe>
+        </div>`;
+
+        let popup = new mapboxgl.Popup({focusAfterOpen:false}).setHTML(popupContent);
+        popup.on('open', function() {
+            markerDiv.classList.add('active')
+        });
+
+        popup.on('close', function() {
+            markerDiv.classList.remove('active')
+        });
+
+        markerDiv.onmouseover = function(e) {
+           mapMarker.togglePopup();
+        }
+
+        markerDiv.onclick = function(e) {
+            e.stopPropagation();
+            map.flyTo({
+                center:ft.geometry.coordinates,
+                zoom:18,
+            });
+
+            map.once('zoomend', () => {
+                map.setPitch(60, {duration: 2000});
+            });
+        }
+
+        return mapMarker.setPopup(popup).setLngLat(ft.geometry.coordinates).addTo(map)
+    }
+
+    // accessibility control
+    
+});    
+
+function loadAccessibilityControl() {
+    let layers = (map.getLayer('poi-label') && map.getLayer('transit-label')) ? ['poi-label','transit-label'] : [];
+    let accessibilityControl = new MapboxAccessibility({
+        accessibleLabelProperty: 'name',
+        layers: [...layers]
+    });
+
+    map.addControl(accessibilityControl);
+}
+	    
+	    
+const directions = new MapboxDirections({
+        accessToken: mapboxgl.accessToken,
+        unit: 'metric',
+        profile: 'mapbox/driving-traffic',
+        alternatives: true,
+	container: 'map', // container id	
+        geometries: 'geojson',
+        controls: { instructions: true },
+        flyTo: true,
+        preserveDrawingBuffer: true,	
+        language: 'es'
+});
+
+map.addControl(directions, 'top-left');
+var routeLayers = [];
+var routeData =  {
+    type: 'FeatureCollection',
+    features: []
+};
+
+directions.on('route', function(e) {
+    // get the route data;
+    routeData = map.getSource('directions')._data;
+    console.log(routeData);
+})
+
+// direction reset on layer changes
+function resetRoute() {
+    // let origin = directions.getOrigin()
+    let timerInterval = setInterval(() => {
+        mapLoadTimer();
+    }, 1000);
+
+    function mapLoadTimer() {
+        if(map.getSource('directions')) {clearInterval(timerInterval);}
+        if(!map.getSource('directions') && map.loaded()) {
+            	console.log("Updating Map Directions");
+            	map.addSource('directions', {
+                type:'geojson',
+                data:{...routeData}
+            });
+
+            routeLayers.forEach(layer => map.addLayer(layer));
+            // directions.setOrigin(origin.geometry.coordinates);
+            clearInterval(timerInterval);
+        }
+
+        map.getLayer('defibrilators') ? "": addDefibrilators();
+    }
+
+    
+}
+
+    map.on('load', function() {
+        routeLayers = [...map.getStyle().layers.filter(layer => layer.source == 'directions')];
+        routeData = map.getSource('directions')._data;
+    });
+
+    map.scrollZoom.enable();
+    map.addControl(new mapboxgl.NavigationControl());
+    map.addControl(new MapboxTraffic());
+    map.addControl(new mapboxgl.FullscreenControl({container: root}));
+        map.addControl(new MapboxGLButtonControl([
+            {
+                className: 'mapboxgl-ctrl-map',
+                title: 'Estilo del mapa',
+                eventHandler() {
+                    mapStyleBg.style.display = 'block';
+                }
+            }, 
+            {
+                className: 'mapboxgl-ctrl-rain',
+                title: 'Opacidad color de lluvia',
+                eventHandler() {
+                    rainBg.style.display = 'block';
+                }
+            }, 
+            {
+                className: 'mapboxgl-ctrl-defibrilators',
+                title: 'Desfibriladores',
+                eventHandler() {
+                    showDefibrilators = !showDefibrilators;
+                    let visibilityStatus = showDefibrilators ? 'none' : 'visible';
+
+                    map.setLayoutProperty('defibrilators', 'visibility', visibilityStatus);
+                }
+            },
+		 {
+                className: 'mapboxgl-ctrl-world',
+                title: 'Mundo', 
+			 
+		 eventHandler() {
+                    map.flyTo({
+            center: [-3.228, 41.655], zoom: 0, pitch: 40, bearing: 0,
+            essential: true // this animation is considered essential with respect to prefers-reduced-motion
+        });
+                		}
+                
+            },
+		
+	        {
+                className: 'mapboxgl-ctrl-home',
+                title: 'Cámaras',
+                eventHandler() {
+                    console.log("")
+                    showMarkers = !showMarkers;
+
+                    // toggle 
+                    videoMarkers.forEach(marker => {
+                        if(showMarkers) {
+                            marker.addTo(map);
+                        } else {
+                            marker.remove();
+                        }
+                    });
+
+                
+                	}
+	        },
+						  
+	        {
+                className: 'mapboxgl-ctrl-info',
+                title: 'Info',
+                eventHandler() {
+                    infoBg.style.display = 'block';
+                }
+            }
+        ]));
+
+        mapStyleBg.addEventListener('click', () => {
+            mapStyleBg.style.display = 'none';
+        });
+
+        let styles = [
+            'terrain', 
+            'iarakistain/cl5guvut6006o14o1nl0ppe5u', 
+            'iarakistain/cl5gil0ym006614o1gkrym5ke', 
+            'iarakistain/cllewvxq5011p01ph3ovh6h5d',
+            'iarakistain/cl65j5le2000z14tipe3hsnuy', 
+            'iarakistain/cl65izeqo000x14ti16nbcx42', 
+            'iarakistain/cl65iqpnc003114n3awqprzvs',
+            'iarakistain/cl65i9s4g000q15oxdwsvktsv',
+	    'iarakistain/cl64qr1rf000414oal5n058aj'
+        ];
+
+        for (const style of styles) {
+            const e = document.getElementById(style);
+            e.addEventListener('click', function (e) {
+                document.querySelector('#map-styles .active').classList.remove('active');
+                e.target.classList.add('active');
+                mapStyleBg.style.display = 'none';
+
+                if(map.getLayer('rain')) map.removeLayer('rain');
+                // map.removeLayer('directions');
+
+                
+                if(style.includes('iarakistain'))  {
+                    map.setStyle(`mapbox://styles/${style}`);
+                } else {
+                    map.setStyle(style === 'terrain' ? 'rain-layer.json' : `mapbox://styles/mapbox/${style}`);
+                }
+
+                map.setProjection('mercator');
+                map.once('styledata', () => {
+                    
+                    // map.once('styledata', () => {
+                       map.addLayer(rainLayer, style === 'terrain' ? 'water-boundary-bg' : style !== 'satellite-v9' ? 'road-label' : null);
+                    // });
+                    resetRoute();
+                    map.setProjection('mercator');
+                });
+		
+                // removeDirectionsLayers();
+                mapStyle = style;
+                // addDirectionsLayers();
+                
+            });
+        }
+            
+            
+  
+    $('#downloadLink').click(function() {
+        var img = map.getCanvas().toDataURL('image/png')
+        this.href = img
+    });           
+            
+  map.on('load', function(){
+  var scale = new mapboxgl.ScaleControl({
+    maxWidth: 80,
+    unit: 'metric'
+  });
+
+  map.addControl(scale);
+  
+});    
+       
+        
+function toggleSidebar(id) {
+    var elem = document.getElementById(id);
+    var classes = elem.className.split(' ');
+    var collapsed = classes.indexOf('collapsed') !== -1;
+    var padding = {};
+  
+    if ( collapsed ) {
+        // Remove the 'collapsed' class from the class list of the element, this sets it back to the expanded state.
+        classes.splice(classes.indexOf('collapsed'), 1);
+
+        padding[id] = 300; // In px, matches the width of the sidebars set in .sidebar CSS class
+        map.easeTo({
+            padding: padding,
+            duration: 1000 // In ms, CSS transition duration property for the sidebar matches this value
+        });
+
+    } else {
+        padding[id] = 0;
+
+        // Add the 'collapsed' class to the class list of the element
+        classes.push('collapsed');
+  
+        map.easeTo({
+            padding: padding,
+            duration: 1000
+        });
+
+    }
+  
+    // Update the class list on the element
+    elem.className = classes.join(' ');
+
+}
+  
+map.on( 'load', function () {
+    //toggleSidebar('left');
+    addDefibrilators();
+});
+  
+// add defibrilators 
+function addDefibrilators() {
+    map.loadImage('assets/images/desfib.png', (error, image) => {
+        if (error) throw error;
+        // Add the loaded image to the style's sprite with the ID 'kitten'.
+        map.addImage('defibrilators', image);
+    });
+
+    map.loadImage('assets/images/Electricar.png', (error, image) => {
+        if (error) throw error;
+        // Add the loaded image to the style's sprite with the ID 'kitten'.
+        map.addImage('electricar', image);
+    });
+
+    map.addSource('defibrilators', {
+        type:'geojson',
+        // data:'Ubicaciones_Desfibriladores_LatLong.json',
+        data:'puntos-de-recarga-del-vehiculo-electrico.json'
+    });
+
+    map.addLayer({
+        id:'defibrilators',
+        source:'defibrilators',
+        type:'symbol',
+        paint:{},
+        layout:{
+            'icon-image':'electricar',
+            'icon-size':0.1,
+            'visibility':'visible'
+        }
+    });
+}
+   
+	    
+rainBg.addEventListener('click', () => {
+    rainPickr.applyColor();
+    snowPickr.applyColor();
+    rainBg.style.display = 'none';
+});
+
+rain.addEventListener('click', e => {
+    e.stopPropagation();
+});
+
+rainColorButton.addEventListener('click', e => {
+    rainColorButton.classList.add('active');
+    snowColorButton.classList.remove('active');
+    rainColorPicker.classList.add('active');
+    snowColorPicker.classList.remove('active');
+});
+
+snowColorButton.addEventListener('click', e => {
+    snowColorButton.classList.add('active');
+    rainColorButton.classList.remove('active');
+    snowColorPicker.classList.add('active');
+    rainColorPicker.classList.remove('active');
+});
+
+const rainPickr = Pickr.create({
+    el: '#rain-color-picker-inner',
+    theme: 'monolith',
+    default: '#ccf',
+    useAsButton: true,
+    inline: true,
+    showAlways: true,
+    defaultRepresentation: 'RGBA',
+    components: {
+        preview: true,
+        opacity: true,
+        hue: true,
+        interaction: {
+            input: true
+        }
+    }
+});
+
+rainPickr.on('change', color => {
+    rainLayer.setRainColor(color.toRGBA().toString(0));
+});
+
+const snowPickr = Pickr.create({
+    el: '#snow-color-picker-inner',
+    theme: 'monolith',
+    default: '#fff',
+    useAsButton: true,
+    inline: true,
+    showAlways: true,
+    defaultRepresentation: 'RGBA',
+    components: {
+        preview: true,
+        opacity: true,
+        hue: true,
+        interaction: {
+            input: true
+        }
+    }
+});
+
+snowPickr.on('change', color => {
+    rainLayer.setSnowColor(color.toRGBA().toString(0));
+});
+
+slider.addEventListener('input', e => {
+    const value = e.target.value;
+    document.getElementById('mesh-opacity').textContent = value;
+    rainLayer.setMeshOpacity(+value);
+});
+
+infoBg.addEventListener('click', () => {
+    infoBg.style.display = 'none';
+});
+
+info.addEventListener('click', e => {
+    e.stopPropagation();
+});
+
+rainLayer.on('refresh', ({timestamp}) => {
+    const date = new Date(timestamp * 1000).toString().replace(/\(.+\)$/, '');
+    lastUpdated.innerHTML = `Actualizado: ${date}`;
+});
+
+legend.innerHTML = rainLayer.getLegendHTML();
+
+map.once('styledata', () => {
+    map.getLayer('water-boundary-bg') ? map.addLayer(rainLayer, 'water-boundary-bg') : map.addLayer(rainLayer);
+
+    map.on('move', e => {
+        if (mapStyle === 'terrain') {
+            setSunPosition(map);
+        }
+    });
+
+    setInterval(() => {
+        if (mapStyle === 'terrain') {
+            setSunPosition(map);
+        }
+    }, 60000);
+});
+
+let lastClockUpdated;
+
+function repeat() {
+    const now = Date.now();
+
+    if (Math.floor(now / 1000) !== Math.floor(lastClockUpdated / 1000)) {
+        time.innerHTML = new Date().toString().replace(/\(.+\)$/, '');
+        lastClockUpdated = now;
+    }
+    requestAnimationFrame(repeat);
+}
+  
+repeat();
+       
+    </script>
+</body>
+</html>
