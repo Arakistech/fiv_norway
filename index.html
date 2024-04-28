@@ -832,6 +832,27 @@ function resetRoute() {
                     rainBg.style.display = 'block';
                 }
             };
+		, 
+            {
+                className: 'mapboxgl-ctrl-defibrilators',
+                title: 'Desfibriladores',
+                eventHandler() {
+                    showDefibrilators = !showDefibrilators;
+                    let visibilityStatus = showDefibrilators ? 'none' : 'visible';
+
+                    map.setLayoutProperty('defibrilators', 'visibility', visibilityStatus);
+                }
+            },
+		 {
+                className: 'mapboxgl-ctrl-world',
+                title: 'Mundo', 
+			 
+		 eventHandler() {
+                    map.flyTo({
+            center: [-3.228, 41.655], zoom: 0, pitch: 40, bearing: 0,
+            essential: true // this animation is considered essential with respect to prefers-reduced-motion
+        })
+
                 		}
                 
             },
